@@ -15,9 +15,29 @@ input = "409	194	207	470	178	454	235	333	511	103	474	293	525	372	408	428
 489	732	57	75	61	797	266	593	324	475	733	737	113	68	267	141
 3858	202	1141	3458	2507	239	199	4400	3713	3980	4170	227	3968	1688	4352	4168"
 
-p input
+table = input
   .split("\n")
   .map{|row| row.split("\t").map{|n| n.to_i} }
+
+# part 1
+p table
   .map{|row_numbers| row_numbers.max - row_numbers.min }
   .sum
+
+# part 2
+
+def find_pair(row_numbers)
+  sorted = row_numbers.sort.reverse
+  sorted.each_with_index {|n, idx|
+    ((idx+1)..(sorted.size-1)).each { |idx2|
+      m = sorted[idx2]
+      if n.remainder(m) == 0
+        return n / m
+      end
+    }
+  }
+  0
+end
+
+puts table.map{|row_numbers| find_pair(row_numbers) }.sum
 
