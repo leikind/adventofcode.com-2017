@@ -2,7 +2,23 @@ input = "49475113689534589473258236262957653959918429619531816266469518939336437
 
 digits = input.split("").map{|s|s.to_i}
 
+# part 1
 puts (digits + [digits[0]])
   .each_cons(2)
   .to_a
   .reduce(0) { |acc, tuple| tuple[0] == tuple[1] ? acc + tuple[0] : acc }
+
+# part 2
+size = digits.size
+step = size / 2
+
+puts digits
+  .each_with_index
+  .to_a
+  .select { |digit, idx|
+    next_idx = idx + step
+    next_idx = next_idx > size - 1 ? next_idx - size : next_idx
+    digit == digits[next_idx]
+  }
+  .map{|digit, _| digit}
+  .sum
