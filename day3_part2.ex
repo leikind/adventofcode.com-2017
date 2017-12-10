@@ -84,7 +84,7 @@ defmodule Matrix do
           {:ok, n} -> n
             |> Integer.to_string
             |> String.pad_leading(5)
-            |> :io.format
+            |> IO.write
         end
       end)
       IO.puts("")
