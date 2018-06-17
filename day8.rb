@@ -11,11 +11,9 @@ module Day8
     \s
     ([[:alpha:]]+)
     \s
-    (
-      [<>=!]+
-      \s
-      -?\d+
-    )
+    ([<>=!]+)
+    \s
+    (-?\d+)
   }x
 
   module_function
@@ -23,29 +21,54 @@ module Day8
   def each
     File.readlines('./day8.txt').each do |line|
       if m = line.match(REGEXP)
-        yield m[1..5]
+        yield [m[1], m[2], m[3].to_i, m[4], m[5], m[6].to_i]
       end
     end
   end
 
   def solve
     registers = {}
-    init_code = ''
-    exe_code = ''
+
+    instructions = []
+
     max = 0
 
-    each do |object_name, op, mod, object_cond, cond|
-      init_code << "registers[:#{object_name}] = registers[:#{object_cond}] = 0\n"
+    each do |object_name, op1, mod, object_cond, op2, cond_val|
+      registers[object_name] = 0
+      registers[object_cond] = 0
 
-      op = op == 'dec' ? '-= ' : '+= '
-      obj = "registers[:#{object_name}]"
-
-      exe_code << "#{obj} #{op} #{mod} if registers[:#{object_cond}] #{cond}\n"
-      exe_code << "max = #{obj} if #{obj} > max\n"
+      instructions << [object_name, op1, mod, object_cond, op2, cond_val]
     end
 
-    eval(init_code)
-    eval(exe_code)
+    instructions.each do |object_name, op1, mod, object_cond, op2, cond_val|
+      object_cond = registers[object_cond]
+      check_result = case op2
+      when '>='
+        object_cond >= cond_val
+      when '>'
+        object_cond > cond_val
+      when '!='
+        object_cond != cond_val
+      when '=='
+        object_cond == cond_val
+      when '<='
+        object_cond <= cond_val
+      when '<'
+        object_cond < cond_val
+      else
+        raise op2
+      end
+
+      if check_result
+        if op1 == 'dec'
+          registers[object_name] -= mod
+        else
+          registers[object_name] += mod
+        end
+      end
+
+      max = registers[object_name] if registers[object_name] > max
+    end
 
     [registers.values.max, max]
   end
